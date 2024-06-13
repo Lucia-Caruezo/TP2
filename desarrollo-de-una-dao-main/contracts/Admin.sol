@@ -6,7 +6,9 @@ import "/Member.sol";
 contract Admin is Member {
     mapping(address => bool) public admins;
 
-    constructor(address _daoAddress) Member(_daoAddress) {}
+    constructor(address _daoAddress) Member(_daoAddress) {
+        admins[msg.sender];
+    }
 
     event AdminAdded(address admin);
     event AdminRemoved(address admin);
