@@ -10,6 +10,7 @@ contract Member {
 
     constructor(address _daoAddress) {
         daoAddress=_daoAddress;
+        members[msg.sender];
     }
 
     // Eventos
