@@ -7,10 +7,12 @@ import "/Admin.sol";
 contract DAO {
     // Struct para una Propuesta
     struct Proposal {
-        string description;
+        address payable recipient;
+        uint256 amount;
         uint256 deadline;
         uint256 votesFor;
         uint256 votesAgainst;
+        bool approved;
         bool executed;
         mapping(address => bool) voted;
     }
@@ -38,11 +40,11 @@ contract DAO {
     Admin public AdminContract;
 
     // Eventos
-    event ProposalCreated(uint256 proposalId, string description, uint256 deadline);
+    event ProposalCreated(uint256 proposalId, address recipient, uint256 amount, uint256 deadline);
     event VoteForProposal(address voter, uint256 proposalId, bool support);
+    event ProposalApproved(uint256 proposalId);
     event ProposalExecuted(uint256 proposalId);
     //para mover los fondos
-    event FundsDeposited(address from, uint256 amount);
     event FundsWithdrawn(address to, uint256 amount);
     //elecciones
     event ElectionStarted(string position, uint256 deadline, address candidate);
@@ -52,6 +54,7 @@ contract DAO {
     // Constructor
     constructor(address _MemberAddress, address _AdminAddress) {
         chairperson = msg.sender;
+        treasurer = msg.sender;
         MemberContract = Member(_MemberAddress);
         AdminContract = Admin(_AdminAddress);
     }
@@ -78,13 +81,22 @@ contract DAO {
 
 
     // Función para crear una nueva propuesta (deben implementarla)
-    function createProposal(string memory _description, uint256 _duration) external onlyMember {
+    function createProposal(address payable _recipient, uint256 _amount) external onlyMember {
+        require(_amount<=funds, "El monto propuesto excede los fondos disponibles");
+        uint256 _duration;
+        if (_amount>(funds/2)) {
+            _duration = 5 days;
+        } else {
+            _duration = 2 days;
+        }
+        
         Proposal storage newProposal = proposals[proposalCount];
-        newProposal.description = _description;
+        newProposal.recipient = _recipient;
         newProposal.deadline = block.timestamp + _duration; /// que es esto? 
+        newProposal.amount = _amount;
         newProposal.executed = false;
         proposalCount++;
-        emit ProposalCreated(proposalCount, _description, newProposal.deadline);
+        emit ProposalCreated(proposalCount, _recipient, _amount, newProposal.deadline);
     }
 
     // Función para votar en una propuesta (deben implementarla)
@@ -111,24 +123,43 @@ contract DAO {
         emit VoteForProposal(msg.sender, _proposalId, _support);
     }
 
-    // Función para ejecutar una propuesta (deben implementarla)
-    function executeProposal(uint256 _proposalId) external onlyChairperson {
+    function countVotes(uint256 _proposalId, bool _support) external onlyChairperson {
         Proposal storage proposal = proposals[_proposalId];
         require(block.timestamp >= proposal.deadline, "La votacion aun no ha terminado");
-        require(!proposal.executed, "La propuesta ya ha sido ejecutada");
-
+        require(!proposal.approved, "La propuesta ya ha sido aprobada");
         if (proposal.votesFor > proposal.votesAgainst) {
-            // Implementar la logica para ejecutar la propuesta
-            proposal.executed = true;
-            emit ProposalExecuted(_proposalId);
+            proposal.approved = true; // Propuesta aprobada
+        } else if (proposal.votesFor == proposal.votesAgainst) {
+            if (_support) {
+                proposal.approved = true; // Propuesta aprobada
+            } else {
+                proposal.approved = false; // Propuesta no aprobada
+            }
+        } else {
+            proposal.approved = false; // Propuesta no aprobada
         }
+        emit ProposalApproved(_proposalId);
+    }
+
+    // Función para ejecutar una propuesta (deben implementarla)
+    function executeProposal(uint256 _proposalId) external onlyTreasurer {
+        Proposal storage proposal = proposals[_proposalId];
+        require(!proposal.executed, "La propuesta ya ha sido ejecutada");
+        require(proposal.approved, "La propuesta no ha sido aprobada");
+
+        // Implementar la logica para ejecutar la propuesta
+        funds -= proposal.amount;
+        proposal.recipient.transfer(proposal.amount);
+        proposal.executed = true;
+        emit ProposalExecuted(_proposalId);
+        emit FundsWithdrawn(proposal.recipient, proposal.amount);
     }
   // Función para iniciar una elección para presidente o tesorero
-    function startElection(string memory _position, address _candidate, uint256 _duration) external onlyAdmin {
+    function startElection(string memory _position, address _candidate) external onlyAdmin {
         Election storage newElection = elections[electionCount];
         newElection.position = _position;
         newElection.candidate = _candidate;
-        newElection.deadline = block.timestamp + _duration;
+        newElection.deadline = block.timestamp + 5 days;
         newElection.executed = false;
         electionCount++;
         emit ElectionStarted(_position, newElection.deadline, _candidate);
@@ -156,12 +187,25 @@ contract DAO {
         require(election.votesFor > election.votesAgainst, "El candidato no ha recibido suficientes votos positivos.");
 
         if (keccak256(bytes(election.position)) == keccak256(bytes("chairperson"))) {
+            require(election.candidate != treasurer, "El candidato ya es tesorero, no puede tener doble funcion");
             chairperson = election.candidate;
         } else if (keccak256(bytes(election.position)) == keccak256(bytes("treasurer"))) {
+            require(election.candidate != chairperson, "El candidato ya es presidente, no puede tener doble funcion");
             treasurer = election.candidate;
         }
-
         emit ElectionExecuted(election.candidate, election.position);
     }
 
+    // Función para verificar el estado de una propuesta
+    function getProposalStatus(uint256 _proposalId) external view returns (string memory) {
+        Proposal storage proposal = proposals[_proposalId];
+        
+        if (proposal.executed) {
+            return "Aprobada y ejecutada";
+        } else if (proposal.approved) {
+            return "Aprobada pero no ejecutada";
+        } else {
+            return "No aprobada";
+        }
+    }
 }
