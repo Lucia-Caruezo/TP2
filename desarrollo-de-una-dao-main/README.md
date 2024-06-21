@@ -1,5 +1,5 @@
 # Trabajo Práctico Número 2: Desarrollo de una DAO
-Trabajo Práctico Número 2 de la materia Introducción a Blockchain, dictada durante el primer semestre de 2024 (Escuela de Negocios, Universidad Torcuato Di Tella), realizado por Lucia Caruezo, 
+Trabajo Práctico Número 2 de la materia Introducción a Blockchain, dictada durante el primer semestre de 2024 (Escuela de Negocios, Universidad Torcuato Di Tella), realizado por Lucia Caruezo, Ayumi Florencia Ito, y Luciano Pozzoli. 
 
 ## Introducción
 Este repositorio contiene un template de implementación de una Organización Autónoma Descentralizada (DAO). Incluye el código base de los contratos inteligentes, scripts de deploy y pruebas.
