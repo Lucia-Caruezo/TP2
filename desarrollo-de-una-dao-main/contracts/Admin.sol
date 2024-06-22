@@ -16,7 +16,7 @@ contract Admin is Member {
     function addAdmin(address _admin) external payable onlyMember {
         require(!admins[_admin], "El administrador ya esta registrado");
         /// modificar para que 
-        require(joinDate[_admin]>=5, "El miembro no cumple con la duracion requerida para ser administrador");
+        require(joinDate[_admin]>= block.timestamp - 5 days, "El miembro no cumple con la duracion requerida para ser administrador");
         require(msg.value >= 2 ether, "Debe depositar al menos 2 ETH");
 
         //Transferir los fondos a la DAO
