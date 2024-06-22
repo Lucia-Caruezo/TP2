@@ -8,6 +8,7 @@ contract DAO {
     // Struct para una Propuesta
     struct Proposal {
         address payable recipient;
+        string category;
         uint256 amount;
         uint256 deadline;
         uint256 votesFor;
@@ -40,12 +41,13 @@ contract DAO {
     Admin public AdminContract;
 
     // Eventos
-    event ProposalCreated(uint256 proposalId, address recipient, uint256 amount, uint256 deadline);
+    event ProposalCreated(uint256 proposalId, address recipient, uint256 amount, string category, uint256 deadline);
     event VoteForProposal(address voter, uint256 proposalId, bool support);
     event ProposalApproved(uint256 proposalId);
     event ProposalExecuted(uint256 proposalId);
     //para mover los fondos
     event FundsWithdrawn(address to, uint256 amount);
+    event FundsDeposited(address from, uint256 amount);
     //elecciones
     event ElectionStarted(string position, uint256 deadline, address candidate);
     event VoteForElection(address voter, address candidate, bool support);
@@ -80,23 +82,24 @@ contract DAO {
     }
 
 
-    // Función para crear una nueva propuesta (deben implementarla)
+    // Función para crear una nueva propuesta 
     function createProposal(address payable _recipient, uint256 _amount) external onlyMember {
         require(_amount<=funds, "El monto propuesto excede los fondos disponibles");
-        uint256 _duration;
-        if (_amount>(funds/2)) {
-            _duration = 5 days;
-        } else {
-            _duration = 2 days;
-        }
-        
+
         Proposal storage newProposal = proposals[proposalCount];
         newProposal.recipient = _recipient;
-        newProposal.deadline = block.timestamp + _duration; /// que es esto? 
+        if (_amount>(funds/2)) {
+            newProposal.deadline = block.timestamp + 5 days; 
+            newProposal.category = "Risky";
+        } else {
+            newProposal.deadline = block.timestamp + 2 days; 
+            newProposal.category = "Moderate";
+        }
         newProposal.amount = _amount;
+        newProposal.approved = false;
         newProposal.executed = false;
         proposalCount++;
-        emit ProposalCreated(proposalCount, _recipient, _amount, newProposal.deadline);
+        emit ProposalCreated(proposalCount, _recipient, _amount, newProposal.category, newProposal.deadline);
     }
 
     // Función para votar en una propuesta (deben implementarla)
@@ -196,6 +199,12 @@ contract DAO {
         emit ElectionExecuted(election.candidate, election.position);
     }
 
+    // Función para depositar fondos, ya sea de colaboradores o protocolos que fueron exitosos
+    function depositFunds() external payable {
+        funds += msg.value;
+        emit FundsDeposited(msg.sender, msg.value);
+    }
+
     // Función para verificar el estado de una propuesta
     function getProposalStatus(uint256 _proposalId) external view returns (string memory) {
         Proposal storage proposal = proposals[_proposalId];
@@ -207,5 +216,10 @@ contract DAO {
         } else {
             return "No aprobada";
         }
+    }
+
+    // Función para obtener el balance de fondos
+    function getFunds() external view returns (uint256) {
+        return funds;
     }
 }
