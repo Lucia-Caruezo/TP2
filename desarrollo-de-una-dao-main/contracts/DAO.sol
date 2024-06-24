@@ -7,20 +7,20 @@ import "/Admin.sol";
 contract DAO {
     // Struct para una Propuesta
     struct Proposal {
-        address payable recipient;
-        string category;
-        uint256 amount;
-        uint256 deadline;
-        uint256 votesFor;
-        uint256 votesAgainst;
-        bool approved;
-        bool executed;
-        mapping(address => bool) voted;
+        address payable recipient; //Protocolo que recibe el financiamiento
+        uint256 amount; //Monto que va a recibir el protocolo
+        string category; //Dependiendo del monto, puede ser riesgosa o moderada
+        uint256 deadline; //Fecha límite de votación
+        uint256 votesFor; //Votos a favor de la propuesta
+        uint256 votesAgainst; //Votos en contra de la propuesta
+        bool approved; //True si ya fue aprobada
+        bool executed; //True cuando fue ejecutada
+        mapping(address => bool) voted; //Registro de si los miembros votaron
     }
-
+    // Struct para las Elecciones Internas
     struct Election {
-        string position;
-        address candidate;
+        string position; //Posición a la que se postula al miembro: Presidente (Chairperson) o Tesorero (Treasurer)
+        address candidate; //Miembro que se postula, el candidato
         uint256 deadline;
         uint256 votesFor;
         uint256 votesAgainst;
