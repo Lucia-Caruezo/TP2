@@ -8,7 +8,7 @@ contract Admin is Member {
 
     // Agregamos al creador como administrador
     constructor() Member() {
-        admins[msg.sender];
+        admins[msg.sender]=true;
     }
 
     // Eventos
