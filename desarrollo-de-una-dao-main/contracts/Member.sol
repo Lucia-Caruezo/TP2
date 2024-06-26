@@ -6,11 +6,9 @@ contract Member {
     mapping(address => bool) public members;
     mapping(address => bool) public invitations;
     mapping(address => uint256) public joinDate;
-    
-    address public daoAddress;
 
-    constructor(address _daoAddress) {
-        daoAddress=_daoAddress;
+    // Iniciamos con el creador como unico miembro
+    constructor() {
         members[msg.sender];
     }
 
@@ -19,7 +17,7 @@ contract Member {
     event MemberRemoved(address member);
     event MemberInvited(address member);
 
-    //modificador
+    // Modificador
     modifier onlyMember(){
         require (members[msg.sender], "Solo los miembros pueden realizar esta accion.");
         _;
@@ -34,13 +32,11 @@ contract Member {
     
     // Función para añadir un nuevo miembro
     function addMember(address _member) external payable {
-        // Implementar
         require(!members[_member], "El miembro ya esta registrado.");
         require(invitations[_member], "No ha sido invitado.");
         require(msg.value >=1 ether, "Debe depositar al menos 1 ETH");
        
-        //Transferir los fondos a la DAO
-        payable(daoAddress).transfer(msg.value);
+        payable(daoAddress).transfer(msg.value); //Transferir los fondos a la DAO
 
         members[_member]=true;
         joinDate[_member] = block.timestamp;
@@ -48,9 +44,10 @@ contract Member {
     }
 
     // Función para eliminar un miembro
-    function removeMember(address _member) external onlyMember {
-        // Implementar
+    function removeMember(address _member) external {
         require(members[_member], "El miembro no esta registrado.");
+        require(msg.sender==_member, "Solo el miembro puede elegir abandonar la DAO"); //Para evitar eliminaciones arbitrarias
+        members[_member]=false;
         members[_member]=false;
         emit MemberRemoved(_member);
     }
