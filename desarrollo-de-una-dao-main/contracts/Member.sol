@@ -48,7 +48,6 @@ contract Member {
         require(members[_member], "El miembro no esta registrado.");
         require(msg.sender==_member, "Solo el miembro puede elegir abandonar la DAO"); //Para evitar eliminaciones arbitrarias
         members[_member]=false;
-        members[_member]=false;
         emit MemberRemoved(_member);
     }
 
