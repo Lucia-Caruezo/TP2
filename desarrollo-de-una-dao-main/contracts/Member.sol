@@ -34,7 +34,7 @@ contract Member {
     function addMember(address _member, address daoAddress) external payable {
         require(!members[_member], "El miembro ya esta registrado.");
         require(invitations[_member], "No ha sido invitado.");
-        require(msg.value >=1 ether, "Debe depositar al menos 1 ETH");
+        require(msg.value >= 0.0001 ether, "Debe depositar al menos 0.0001 ETH");
        
         payable(daoAddress).transfer(msg.value); //Transferir los fondos a la DAO
 
