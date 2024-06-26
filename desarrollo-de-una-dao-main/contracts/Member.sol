@@ -31,7 +31,7 @@ contract Member {
     }
     
     // Función para añadir un nuevo miembro
-    function addMember(address _member) external payable {
+    function addMember(address _member, address daoAddress) external payable {
         require(!members[_member], "El miembro ya esta registrado.");
         require(invitations[_member], "No ha sido invitado.");
         require(msg.value >=1 ether, "Debe depositar al menos 1 ETH");
