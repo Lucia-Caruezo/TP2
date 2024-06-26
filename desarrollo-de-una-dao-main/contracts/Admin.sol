@@ -6,7 +6,7 @@ import "/Member.sol";
 contract Admin is Member {
     mapping(address => bool) public admins;
 
-    // CHEQUEAR Agregamos al creador como administrador
+    // Agregamos al creador como administrador
     constructor() Member() {
         admins[msg.sender];
     }
@@ -16,11 +16,11 @@ contract Admin is Member {
     event AdminRemoved(address admin);
 
     // Funcion para pasar a ser administrador
-    function addAdmin(address _admin) external payable onlyMember {
+    function addAdmin(address _admin, address daoAddress) external payable onlyMember {
         require(!admins[_admin], "El administrador ya esta registrado");
         // El admin debe llevar por lo menos 5 dias como miembro
         require(joinDate[_admin]>= block.timestamp - 5 days, "El miembro no cumple con la duracion requerida para ser administrador");
-        require(msg.value >= 2 ether, "Debe depositar al menos 2 ETH");
+        require(msg.value >= 0.0005 ether, "Debe depositar al menos 0.0005 ETH");
 
         payable(daoAddress).transfer(msg.value); //Transferir los fondos a la DAO
 
