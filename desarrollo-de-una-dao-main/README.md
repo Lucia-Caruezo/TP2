@@ -43,7 +43,3 @@ Los contratos fueron desarrollados en Remix y deployados en la testnet de Sepoli
 1. Deployamos el contrato Member ``
 2. Deployamos el contrato Admin, que hereda del contrato Member ``
 3. Deployamos el contrato DAO, que integra los contratos Member y Admin ``
-
-`tests/:` Contiene los scripts de prueba para los contratos.
-`scripts/:`Contiene los scripts de deploy y otros scripts auxiliares (para Hardhat).
-`migrations/:` Contiene los scripts de migración (para Truffle).
