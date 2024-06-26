@@ -1,32 +1,45 @@
 # Trabajo Práctico Número 2: Desarrollo de una DAO
 Trabajo Práctico Número 2 de la materia Introducción a Blockchain, dictada durante el primer semestre de 2024 (Escuela de Negocios, Universidad Torcuato Di Tella), realizado por Lucia Caruezo, Ayumi Florencia Ito, y Luciano Pozzoli. 
 
-## Table of Contents
-- [Overview](#overview)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+## Tabla de Contenidos
+- [Introducción](#introducción)
+- [Contratos](#contratos)
+- [Member](#member)
+- [Admin](#admin)
+- [DAO](#dao)
+- [Deployment](#deployment)
   
 ## Introducción
 Este proyecto implementa una DAO (Organización Autónoma Descentralizada) que actúa como un fondo común de inversión. La DAO se gestiona a través de tres contratos inteligentes: Member, Admin y DAO. Estos contratos automatizan el registro de miembros y administradores, la creación y votación de propuestas, y las elecciones internas para elegir al presidente y tesorero.
 
 ## Contratos
+
 ### Member
 Permite a los usuarios registrarse como miembros de la DAO. Funciones principales: 
-	•	addMember(address _member, uint256 _amount): Permite que un nuevo miembro se registre si ha sido invitado y envía la cantidad específica de fondos.
-	•	isMember(address _member): Verifica si una dirección es miembro de la DAO.
-	•	getMembers(): Devuelve la lista de todos los miembros registrados.
+`inviteMember():`
+`addMember(address _member, address daoAddress):` Permite que un nuevo miembro se registre si ha sido invitado y envía la cantidad específica de fondos al contrato DAO. 
+`removeMember(address _member):` Permite que un miembro abandone la DAO.
+`isMember(address _member):` Verifica si una dirección es miembro de la DAO.
+
+### Admin
+Extiende el contrato Member permitiendo a los miembros convertirse en administradores si cumplen ciertos requisitos adicionales. Funciones principales: 
+`addAdmin(address _admin,  address daoAddress):` Permite que un miembro se registre como administrador si cumple con los requisitos adicionales.
+`removeAdmin(address _admin):` Permite que un aministrador abandone la DAO.
+`isAdmin(address _admin):` Verifica si una dirección es administrador de la DAO.
+
+### DAO
+Gestiona las propuestas, votaciones, elecciones internas y movimientos de fondos. Funciones principales: 
+`addAdmin(address _admin,  address daoAddress):` Permite que un miembro se registre como administrador si cumple con los requisitos adicionales.
+`removeAdmin(address _admin):` Permite que un aministrador abandone la DAO.
+`isAdmin(address _admin):` Verifica si una dirección es administrador de la DAO.
 
 
-
-### Desarrollo y Deployment
-
+## Deployment
 Los contratos fueron desarrollados en Remix y deployados en la testnet de Sepolia. 
-La DAO funciona con tres contratos principales: DAO, Member y Admin. 
+1. Deployamos el contrato Member ``
+2. Deployamos el contrato Admin, que hereda del contrato Member ``
+3. Deployamos el contrato DAO, que integra los contratos Member y Admin ``
 
-`contracts/:` Contiene los smart contracts.
 
 ## Ejecutar Pruebas
 Para ejecutar las pruebas (para Truffle o Hardhat):
