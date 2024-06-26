@@ -21,11 +21,11 @@ contract DAO {
     struct Election {
         string position; //Posición a la que se postula al miembro: Presidente (Chairperson) o Tesorero (Treasurer)
         address candidate; //Miembro que se postula, el candidato
-        uint256 deadline;
-        uint256 votesFor;
-        uint256 votesAgainst;
-        bool executed;
-        mapping(address => bool) voted;
+        uint256 deadline; //Fecha límite de la eleccion
+        uint256 votesFor; //Votos a favor del candidato
+        uint256 votesAgainst; //Votos en contra del candidato
+        bool executed; //True cuando fue ejecutada
+        mapping(address => bool) voted; //Registro de si los miembros votaron
     }
 
     // Variables de estado
@@ -35,31 +35,32 @@ contract DAO {
     mapping(uint256 => Election) internal elections;
     uint256 public proposalCount;
     uint256 public electionCount;
-    uint256 private funds; //agrego fondos
-    // para usar los datos del contrato
+    uint256 private funds; 
+    // Para usar los datos del contrato
     Member public MemberContract; 
     Admin public AdminContract;
 
-    // Eventos
+    // Eventos de Propuestas
     event ProposalCreated(uint256 proposalId, address recipient, uint256 amount, string category, uint256 deadline);
     event VoteForProposal(address voter, uint256 proposalId, bool support);
     event ProposalApproved(uint256 proposalId);
     event ProposalExecuted(uint256 proposalId);
-    //para mover los fondos
+    // Eventos de Fondos
     event FundsWithdrawn(address to, uint256 amount);
     event FundsDeposited(address from, uint256 amount);
-    //elecciones
+    // Eventos de Elecciones Internas 
     event ElectionStarted(string position, uint256 deadline, address candidate);
     event VoteForElection(address voter, address candidate, bool support);
     event ElectionExecuted(address candidate, string position);
 
-    // Constructor
+    //  // Iniciamos con el creador como presidente y tesorero
     constructor(address _MemberAddress, address _AdminAddress) {
         chairperson = msg.sender;
         treasurer = msg.sender;
         MemberContract = Member(_MemberAddress);
         AdminContract = Admin(_AdminAddress);
     }
+
     // Modificadores
     modifier onlyChairperson() {
         require(msg.sender == chairperson, "Solo el presidente puede realizar esta accion");
@@ -102,7 +103,7 @@ contract DAO {
         emit ProposalCreated(proposalCount, _recipient, _amount, newProposal.category, newProposal.deadline);
     }
 
-    // Función para votar en una propuesta (deben implementarla)
+    // Función para votar en una propuesta
     function voteProposal(uint256 _proposalId, bool _support) external onlyMember {
         Proposal storage proposal = proposals[_proposalId];
         require(block.timestamp < proposal.deadline, "La votacion ha terminado");
@@ -126,6 +127,7 @@ contract DAO {
         emit VoteForProposal(msg.sender, _proposalId, _support);
     }
 
+    // Funcion para el recuento de votos y determinar si se aprueba o no
     function countVotes(uint256 _proposalId, bool _support) external onlyChairperson {
         Proposal storage proposal = proposals[_proposalId];
         require(block.timestamp >= proposal.deadline, "La votacion aun no ha terminado");
@@ -144,19 +146,19 @@ contract DAO {
         emit ProposalApproved(_proposalId);
     }
 
-    // Función para ejecutar una propuesta (deben implementarla)
+    // Función para ejecutar una propuesta
     function executeProposal(uint256 _proposalId) external onlyTreasurer {
         Proposal storage proposal = proposals[_proposalId];
         require(!proposal.executed, "La propuesta ya ha sido ejecutada");
         require(proposal.approved, "La propuesta no ha sido aprobada");
 
-        // Implementar la logica para ejecutar la propuesta
         funds -= proposal.amount;
         proposal.recipient.transfer(proposal.amount);
         proposal.executed = true;
         emit ProposalExecuted(_proposalId);
         emit FundsWithdrawn(proposal.recipient, proposal.amount);
     }
+
   // Función para iniciar una elección para presidente o tesorero
     function startElection(string memory _position, address _candidate) external onlyAdmin {
         Election storage newElection = elections[electionCount];
