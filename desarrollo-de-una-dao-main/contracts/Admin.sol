@@ -29,7 +29,7 @@ contract Admin is Member {
     }
 
     //Funcion para abandonar la DAO
-    function removeAdmin(address _admin) external onlyMember {
+    function removeAdmin(address _admin) external {
         require(admins[_admin], "El administrador no existe");
         require(msg.sender==_admin, "Solo el admin puede elegir abandonar la DAO"); //Para evitar eliminaciones arbitrarias
         admins[_admin] = false;
