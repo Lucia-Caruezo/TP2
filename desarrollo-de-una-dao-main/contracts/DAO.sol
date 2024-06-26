@@ -35,7 +35,7 @@ contract DAO {
     mapping(uint256 => Election) internal elections;
     uint256 public proposalCount;
     uint256 public electionCount;
-    uint256 private funds; 
+    uint256 public funds; 
     // Para usar los datos del contrato
     Member public MemberContract; 
     Admin public AdminContract;
@@ -85,14 +85,17 @@ contract DAO {
 
     // Función para crear una nueva propuesta 
     function createProposal(address payable _recipient, uint256 _amount) external onlyMember {
-        require(_amount<=funds, "El monto propuesto excede los fondos disponibles");
+        require(_amount>0, "El monto propuesto debe ser positivo.");
+        require(_amount<=funds, "El monto propuesto excede los fondos disponibles.");
 
         Proposal storage newProposal = proposals[proposalCount];
         newProposal.recipient = _recipient;
-        if (_amount>(funds/2)) {
+        if (_amount>(funds/2)) { 
+        // Si la propuesta supera el 50% de los fondos, su votación tendrá duración de 5 días y se considera la propuesta como riesgosa
             newProposal.deadline = block.timestamp + 5 days; 
             newProposal.category = "Risky";
         } else {
+        // En caso contrario, su votación tendrá duración de 2 días y se considera la propuesta como moderada.
             newProposal.deadline = block.timestamp + 2 days; 
             newProposal.category = "Moderate";
         }
@@ -115,13 +118,13 @@ contract DAO {
             if (AdminContract.isAdmin(msg.sender)) {
                 proposal.votesFor +=2; //Voto doble para administradores
             } else {
-            proposal.votesFor++;
+                proposal.votesFor++;
             }
         } else {
             if (AdminContract.isAdmin(msg.sender)) {
                 proposal.votesAgainst +=2; //Voto doble para administradores
             } else {
-            proposal.votesAgainst++;
+                proposal.votesAgainst++;
             }
         }
         emit VoteForProposal(msg.sender, _proposalId, _support);
@@ -159,7 +162,7 @@ contract DAO {
         emit FundsWithdrawn(proposal.recipient, proposal.amount);
     }
 
-  // Función para iniciar una elección para presidente o tesorero
+    // Función para iniciar una elección para presidente o tesorero
     function startElection(string memory _position, address _candidate) external onlyAdmin {
         Election storage newElection = elections[electionCount];
         newElection.position = _position;
