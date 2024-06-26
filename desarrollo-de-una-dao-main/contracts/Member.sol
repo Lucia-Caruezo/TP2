@@ -9,7 +9,8 @@ contract Member {
 
     // Iniciamos con el creador como unico miembro
     constructor() {
-        members[msg.sender];
+        members[msg.sender]=true;
+        joinDate[msg.sender]=block.timestamp;
     }
 
     // Eventos
