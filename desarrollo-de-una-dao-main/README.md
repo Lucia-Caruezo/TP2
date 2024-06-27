@@ -43,6 +43,6 @@ Gestiona las propuestas, votaciones, elecciones internas y movimientos de fondos
 
 ## Deployment
 Los contratos fueron desarrollados en Remix y deployados en la testnet de Sepolia. 
-1. Deployamos el contrato Member ``
-2. Deployamos el contrato Admin, que hereda del contrato Member ``
-3. Deployamos el contrato DAO, que integra los contratos Member y Admin ``
+1. Deployamos el contrato Member, con la siguiente dirección `0x6071516638912b20810b6a26e55ca6fC3D984399`
+2. Deployamos el contrato Admin, que hereda del contrato Member con la siguiente dirección `0xD6B08DD51791041c24c8881eF13874A216da81FB`
+3. Deployamos el contrato DAO, que integra los contratos Member y Admin, con la siguiente dirección ``
