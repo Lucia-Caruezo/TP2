@@ -38,6 +38,7 @@ Gestiona las propuestas, votaciones, elecciones internas y movimientos de fondos
 - `executeElection(uint256 _electionID):` Ejecuta la elección una vez finalizada.
 - `depositFunds():` Permite depositar fondos, ya sea de colaboradores o protocolos que fueron exitosos. 
 - `getProposalStatus(uint256 _proposalId):` Verifica el estado de una propuesta.
+- `getProposalInfo(uint256 _proposalId): ` Permite obtener la infomación de una propuesta. 
 - `getFunds():` Consulta el saldo de los fondos de la DAO.
 
 ## Deployment
