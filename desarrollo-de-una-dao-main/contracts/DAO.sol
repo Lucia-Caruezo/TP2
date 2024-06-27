@@ -164,6 +164,7 @@ contract DAO {
 
     // Función para iniciar una elección para presidente o tesorero
     function startElection(string memory _position, address _candidate) external onlyAdmin {
+        require(AdminContract.isAdmin(_candidate), "El candidato a postular debe ser administrador.");
         Election storage newElection = elections[electionCount];
         newElection.position = _position;
         newElection.candidate = _candidate;
@@ -221,6 +222,12 @@ contract DAO {
         } else {
             return "No aprobada";
         }
+    }
+
+    // Función para obtener la información de una propuesta
+    function getProposalInfo(uint256 _proposalId) external view returns (address recipient, uint256 amount, uint256 deadline, string memory category, bool approved, bool executed) {
+        Proposal storage proposal = proposals[_proposalId];
+        return (proposal.recipient, proposal.amount, proposal.deadline, proposal.category, proposal.approved, proposal.executed);
     }
 
     // Función para obtener el balance de fondos
