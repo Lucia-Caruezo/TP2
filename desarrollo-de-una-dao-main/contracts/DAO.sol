@@ -102,9 +102,9 @@ contract DAO {
         newProposal.amount = _amount;
         newProposal.approved = false;
         newProposal.executed = false;
-        proposalCount++;
         emit ProposalCreated(proposalCount, _recipient, _amount, newProposal.category, newProposal.deadline);
-    }
+        proposalCount++;
+        }
 
     // Función para votar en una propuesta
     function voteProposal(uint256 _proposalId, bool _support) external onlyMember {
